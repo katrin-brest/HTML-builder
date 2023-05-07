@@ -9,17 +9,14 @@ async function buildPage(folder) {
   // create and fill index.html
   encodeFile(path.join(__dirname, 'template.html'), folder) 
   // create and fill style.css
-  
-    await fsProm.writeFile(path.join(folder, 'style.css'), '')
-    const styles = await fsProm.readdir(path.join(__dirname, 'styles'), {withFileTypes:true})
-    for (let file of styles) {
-      if(file.isFile() && path.extname(file.name) === '.css') {
-        const data = await fsProm.readFile(path.join(__dirname, 'styles', file.name))
-        await fsProm.appendFile(path.join(folder, 'style.css'), data) // выводит null в консоль
-      }
+  await fsProm.writeFile(path.join(folder, 'style.css'), '')
+  const styles = await fsProm.readdir(path.join(__dirname, 'styles'), {withFileTypes:true})
+  for (let file of styles) {
+    if(file.isFile() && path.extname(file.name) === '.css') {
+      const data = await fsProm.readFile(path.join(__dirname, 'styles', file.name))
+      await fsProm.appendFile(path.join(folder, 'style.css'), data) // выводит null в консоль
     }
-  
-  
+  }
  // copy assets
   await fsProm.mkdir(path.join(folder, 'assets'))
   copyFolder(path.join(__dirname, 'assets'), path.join(folder, 'assets'))
