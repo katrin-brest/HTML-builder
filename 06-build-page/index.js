@@ -8,15 +8,10 @@ async function buildPage(folder) {
   
   // create and fill index.html
   encodeFile(path.join(__dirname, 'template.html'), folder) 
+
   // create and fill style.css
-  await fsProm.writeFile(path.join(folder, 'style.css'), '')
-  const styles = await fsProm.readdir(path.join(__dirname, 'styles'), {withFileTypes:true})
-  for (let file of styles) {
-    if(file.isFile() && path.extname(file.name) === '.css') {
-      const data = await fsProm.readFile(path.join(__dirname, 'styles', file.name))
-      await fsProm.appendFile(path.join(folder, 'style.css'), data) // выводит null в консоль
-    }
-  }
+  mergeStyles(folder)
+  
  // copy assets
   await fsProm.mkdir(path.join(folder, 'assets'))
   copyFolder(path.join(__dirname, 'assets'), path.join(folder, 'assets'))
@@ -46,7 +41,14 @@ async function encodeFile(file, outputDir) {
     }
     await fsProm.writeFile(path.join(outputDir, 'index.html'), data)
   })
-  
 }
 
-buildPage(path.join(__dirname, 'project-dist'))
+async function mergeStyles (folder) {
+  let files = await fsProm.readdir(path.join(__dirname, 'styles'), {withFileTypes:true})
+  files = files.filter(file => file.isFile() && path.extname(file.name) === '.css').map( file => fsProm.readFile(path.join(__dirname, 'styles', file.name)))
+  let result = await Promise.all(files)
+  await fsProm.writeFile(path.join(folder, 'style.css'), result.join('\n'), 'utf-8')
+}
+
+
+buildPage(path.join(__dirname, 'project-dist')).catch(error => console.log(error))
