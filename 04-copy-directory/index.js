@@ -1,3 +1,4 @@
+const { error } = require('console');
 const fs =  require('fs/promises')
 const path = require('path')
 
@@ -13,4 +14,4 @@ async function copyDir(from, to) {
     console.log(`${file} is copied`);
   }
 }
-copyDir(source, output)
+copyDir(source, output).catch(error => console.log(error))
